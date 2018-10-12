@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context.xsd">
+
+    <context:component-scan base-package="com.neuedu"></context:component-scan>
+
+    <context:property-placeholder location="classpath:jdbc.properties"></context:property-placeholder>
+    <!-- c3p0带有连接池的数据源 -->
+    <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+        <property name="driverClass" value="${jdbc.driver}"></property>
+        <property name="jdbcUrl" value="${jdbc.url}"></property>
+        <property name="user" value="${jdbc.username}"></property>
+        <property name="password" value="${jdbc.password}"></property>
+    </bean>
+    <bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="configLocation" value="classpath:mybatis-config.xml"></property>
+        <property name="mapperLocations" value="classpath:com/neuedu/mapper/*Mapper.xml" ></property>
+        <property name="dataSource" ref="dataSource" ></property>
+    </bean>
+    <bean id="sqlSession" class="org.mybatis.spring.SqlSessionTemplate">
+        <constructor-arg ref="sqlSessionFactory" index="0"></constructor-arg>
+    </bean>
+<!--
+    通过spring ioc容器创建CategoryDaoImpl  -》new CategoryDaoImpl（）
+    id：bean的名称 CategoryDaoImpl = new CategoryDaoImpl（）
+    class：要创建bean的class
+    scope:prototype singlton session globalsesion
+    依赖注入：bean的属性赋值
+    setter
+    构造器注入
+
+    autowire(自动注入)：byName byType constructor
+-->
+
+    <!--<bean id="categoryDaoImpl" class="com.neuedu.dao.impl.CategoryDaoImpl"
+          init-method="init" destroy-method="destory"
+          scope="singleton" autowire="constructor">
+        &lt;!&ndash;底层实现setCategory&ndash;&gt;
+        &lt;!&ndash;<property name="categoryId" value="123"></property>&ndash;&gt;
+
+        &lt;!&ndash;<property name="category" ref="category"></property>
+
+        <constructor-arg index="0" value="1234"></constructor-arg>&ndash;&gt;
+    </bean>
+
+    <bean  class="com.neuedu.pojo.Category"></bean>-->
+
+    <!--<bean id="category" class="com.neuedu.pojo.Category"/>
+    <bean id="category1" class="com.neuedu.pojo.Category"/>-->
+
+</beans>
+

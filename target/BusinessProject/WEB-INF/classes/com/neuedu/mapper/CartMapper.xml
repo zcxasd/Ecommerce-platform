@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+       Copyright 2009-2017 the original author or authors.
+
+       Licensed under the Apache License, Version 2.0 (the "License");
+       you may not use this file except in compliance with the License.
+       You may obtain a copy of the License at
+
+          http://www.apache.org/licenses/LICENSE-2.0
+
+       Unless required by applicable law or agreed to in writing, software
+       distributed under the License is distributed on an "AS IS" BASIS,
+       WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+       See the License for the specific language governing permissions and
+       limitations under the License.
+
+-->
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.neuedu.dao.ICartDao">
+
+    <select id="findCartByUseridAndProductid" parameterType="map" resultType="cart">
+        select id, user_id, product_id, quantity, checked, create_time, update_time
+        from neuedu_cart
+        where user_id=#{userid} and product_id=#{productid}
+    </select>
+
+    <insert id="addProductToCart" parameterType="cart" keyColumn="id" useGeneratedKeys="true">
+        insert into neuedu_cart(user_id,product_id,quantity,checked,create_time, update_time)
+        values(#{user_id},#{product_id},#{quantity},#{checked},now(),now())
+    </insert>
+    
+    <update id="updateCartByUseridAndProductid" parameterType="cart">
+        update neuedu_cart set quantity=#{quantity}
+        where user_id=#{user_id} and product_id=#{product_id}
+    </update>
+
+    <select id="findCartByUserid" parameterType="int" resultType="cart">
+        select id user_id,product_id,quantity,checked,create_time, update_time
+        from neuedu_cart
+        where user_id=#{userid}
+    </select>
+
+    <select id="isCheckAll" parameterType="int" resultType="int">
+        select count(1)
+        from neuedu_cart
+        where user_id=#{userid} and checked=0
+    </select>
+
+    <!--
+        userid
+        productIds
+    -->
+    <delete id="deleteProducts" parameterType="map">
+        delete
+        from neuedu_cart
+        <where>
+            user_id=#{userid}
+            <if test="productIds!=null and productIds.size>0">
+                and product_id in
+                <foreach collection="productIds" item="productId" open="(" close=")" separator=",">
+                    #{productId}
+                </foreach>
+            </if>
+        </where>
+    </delete>
+
+    <update id="checkedProductByProductId" parameterType="map">
+        update neuedu_cart set checked=1 where user_id=#{userid} and product_id=#{productid}
+    </update>
+
+    <update id="uncheckedProductByProductId" parameterType="map">
+        update neuedu_cart set checked=0 where user_id=#{userid} and product_id=#{productid}
+    </update>
+
+    <select id="findAllCartByProductNum" parameterType="int" resultType="int">
+        select sum(quantity)
+        from neuedu_cart
+        where user_id=#{userid}
+    </select>
+
+    <update id="isAllCheck" parameterType="map">
+        update neuedu_cart set checked=1 where user_id=#{userid} and checked=0
+    </update>
+
+    <update id="unIsAllCheck" parameterType="map">
+        update neuedu_cart set checked=0 where user_id=#{userid} and checked=1
+    </update>
+
+    <select id="findCheckedCartsByUserId" parameterType="int" resultType="cart">
+        select id user_id,product_id,quantity,checked,create_time, update_time
+        from neuedu_cart
+        where user_id=#{userid} and checked=1
+    </select>
+
+    <delete id="removeCheckedProduct" parameterType="map">
+        DELETE from neuedu_cart
+        <where>
+            user_id=#{userid} AND product_id IN
+            <foreach collection="cartList" item="cart" open="(" close=")" separator=",">
+                #{cart.product_id}
+            </foreach>
+        </where>
+    </delete>
+</mapper>

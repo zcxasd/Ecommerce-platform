@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="static/jquery.js"></script>
+
+</head>
+<body>
+
+    <script>
+        // $.ready()
+        $(function () {
+            $.ajax({
+                type:"get",
+                url:"http://localhost:8080/BusinessProject/user",
+                async:true,
+                dataType:"json",
+                data:{"operation":"1","username":"xiaoming","password":"147"},
+                success:function (data) {
+                    alert(data.username);
+                }
+            });
+        });
+
+    </script>
+
+</body>
+</html>

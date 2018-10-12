@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body onload="ready()">
+    <script>
+
+        function ready() {
+            // ajax请求
+            var xmlhttp;
+            if (window.XMLHttpRequest){// code for IE7+ Firefox Chrome Opera Safari
+                xmlhttp=new XMLHttpRequest();
+            }else{// ode for IE6,IE5
+                xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+            }
+            // 初始化请求
+            xmlhttp.open("GET","http://localhost:8080/BusinessProject/user?operation=1&username=xiaoming&password=147",true);
+           // 发送请求
+            xmlhttp.send();
+            // 监听请求/响应的状态
+            xmlhttp.onreadystatechange=function () {
+                if (xmlhttp.readyState==4&&xmlhttp.status==200){
+                    //alert(xmlhttp.responseText);
+                    // 将json字符串转js对象
+                    var obj = JSON.parse(xmlhttp.responseText);
+                    alert(obj);
+                    document.getElementById("date").innerHTML=obj.username;
+                }
+            }
+        }
+    </script>
+    <span id="date"></span>
+</body>
+</html>

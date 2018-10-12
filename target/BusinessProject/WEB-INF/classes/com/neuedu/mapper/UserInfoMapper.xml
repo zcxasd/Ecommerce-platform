@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+
+       Copyright 2009-2017 the original author or authors.
+
+       Licensed under the Apache License, Version 2.0 (the "License");
+       you may not use this file except in compliance with the License.
+       You may obtain a copy of the License at
+
+          http://www.apache.org/licenses/LICENSE-2.0
+
+       Unless required by applicable law or agreed to in writing, software
+       distributed under the License is distributed on an "AS IS" BASIS,
+       WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+       See the License for the specific language governing permissions and
+       limitations under the License.
+
+-->
+<!DOCTYPE mapper
+    PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.neuedu.dao.IUserDao">
+
+    <!--查询
+        UserInfo login(Map map)
+    -->
+    <!--登录-->
+    <select id="login" parameterType="map" resultType="user">
+        select id, username, password, email, phone, question, answer, role
+        from neuedu_user
+        where username=#{username} and password=#{password}
+    </select>
+    <!--注册-->
+    <!--useGeneratedKeys:自动增长
+        keyColumn：主键名是什么
+    -->
+    <insert id="register" parameterType="user" useGeneratedKeys="true" keyColumn="id">
+        insert into neuedu_user
+        (username, password, email, phone, question, answer, role, create_time, update_time)
+        values (#{username},#{password},#{email},#{phone},#{question},#{answer},#{role},now(),now())
+    </insert>
+
+    <select id="checkUserName" parameterType="string" resultType="int">
+        select count(1) from neuedu_user where username=#{username}
+    </select>
+
+    <select id="findAll" resultType="user">
+        select id, username, password, email, phone, question, answer, role
+        from neuedu_user
+    </select>
+
+    <!--根据用户名查询用户信息，如果没有用户名，查询所有的用户信息-->
+    <select id="findAllByUsername" parameterType="string" resultType="user">
+       <!-- select id, username, password, email, phone, question, answer, role
+        from neuedu_user
+        where 1=1
+        <if test="_parameter!=null">
+            and username=#{username}
+        </if>-->
+        select id, username, password, email, phone, question, answer, role
+        from neuedu_user
+       <where>
+            <if test="_parameter!=null">
+                  username=#{username}
+            </if>
+       </where>
+    </select>
+
+    <!--先按照用户名查询，如果不存在按照id查询，如果id不存在，按照email查询
+        if-elseif-else
+    -->
+    <select id="findByOption" parameterType="user" resultType="user">
+        select id, username, password, email, phone, question, answer, role
+        from neuedu_user
+        <where>
+          <choose>
+              <when test="username!=null">
+                    username=#{username}
+              </when>
+              <when test="id!=0">
+                    id=#{id}
+              </when>
+              <otherwise>
+                    email=#{email}
+              </otherwise>
+          </choose>
+        </where>
+    </select>
+
+    <!--编辑个人信息-->
+    <update id="updateUser" parameterType="user">
+        UPDATE neuedu_user
+        <set>
+              <if test="username!=null">
+                  username=#{username}
+              </if>
+              <if test="password!=null">
+                  password=#{password}
+              </if>parentId
+              <if test="email!=null">
+                  email=#{email}
+              </if>
+            <if test="phone!=null">
+                phone=#{phone}
+            </if>
+              <if test="question!=null">
+                  question=#{question}
+              </if>
+              <if test="answer!=null">
+                  answer=#{answer}
+              </if>
+            <where>
+                id=#{id}
+            </where>
+          </set>
+    </update>
+
+    <select id="findByIds" parameterType="list" resultType="user">
+        select id, username, password, email, phone, question, answer, role
+        from neuedu_user
+        where id in
+        <foreach collection="list" item="uid" open="(" close=")" separator=",">
+            #{uid}
+        </foreach>
+    </select>
+
+</mapper>
